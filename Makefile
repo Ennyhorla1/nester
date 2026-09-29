@@ -50,6 +50,15 @@ dev-external: ## Start all services with external binding (0.0.0.0) — use only
 dev-down: ## Stop all services
 	docker compose down
 
+db-backup:
+	@bash scripts/db-backup.sh
+
+db-restore:
+	@bash scripts/db-restore.sh $(FILE)
+
+db-restore-drill:
+	@bash scripts/db-restore-drill.shr compose down
+
 dev-reset: ## Destructive reset of database volumes and restart (use only for full rebuilds)
 	docker compose down -v && docker compose up --build
 

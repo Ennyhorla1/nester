@@ -1,0 +1,39 @@
+name: Database Restore Drill
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  restore-drill:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: nester
+          POSTGRES_PASSWORD: nester_dev_password
+          POSTGRES_DB: nester_dev
+        ports:
+          - 5432:5432
+        options: >- ആരോഗ്യ --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Run backup generation
+        run: |
+          make db-backup
+
+      - name: Run automated restore drill
+        run: |
+          make db-restore-drill
